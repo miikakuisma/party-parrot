@@ -9,7 +9,7 @@ const handler = NextAuth({
         email: { label: "Email", type: "text", placeholder: "jsmith@example.com" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         // Here you should check the credentials against your database
         // This is just a placeholder implementation
         if (credentials?.email === "user@example.com" && credentials?.password === "password") {

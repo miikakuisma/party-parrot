@@ -51,11 +51,11 @@ export default function RSVPPage({ params }: { params: { id: string } }) {
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="yes" id="yes" />
-              <Label htmlFor="yes">Yes, I'll be there</Label>
+              <Label htmlFor="yes">Yes, I&apos;ll be there</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="no" id="no" />
-              <Label htmlFor="no">No, I can't make it</Label>
+              <Label htmlFor="no">No, I can&apos;t make it</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="maybe" id="maybe" />
@@ -80,7 +80,7 @@ export default function RSVPPage({ params }: { params: { id: string } }) {
             name="note"
             value={formData.note}
             onChange={handleChange}
-            placeholder="Any additional information you'd like to share"
+            placeholder="Any additional information you&apos;d like to share"
           />
         </div>
         <Button type="submit">Submit RSVP</Button>

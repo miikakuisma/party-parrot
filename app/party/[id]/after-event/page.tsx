@@ -14,7 +14,7 @@ const initialComments = [
   { id: 2, author: "Charlie", content: "The cake was amazing!" },
 ]
 
-export default function AfterEventPage({ params }: { params: { id: string } }) {
+export default function AfterEventPage() {
   const [photoLink, setPhotoLink] = useState("")
   const [comment, setComment] = useState("")
   const [comments, setComments] = useState(initialComments)

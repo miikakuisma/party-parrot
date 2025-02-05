@@ -1,4 +1,5 @@
-import { type ClassValue } from "clsx"
+// Remove unused import
+// import { type ClassValue } from "clsx"
 
 // Database table names
 export const DB_TABLES = {
