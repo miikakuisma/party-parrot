@@ -1,5 +1,6 @@
 "use client"
 
+import { Suspense } from "react"
 import { useState } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -10,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { toast } from "@/components/ui/use-toast"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
-export default function SignInPage() {
+function SignInForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(false)
@@ -60,53 +61,61 @@ export default function SignInPage() {
   }
 
   return (
+    <Card className="w-full max-w-lg">
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl font-bold">Sign in</CardTitle>
+        <CardDescription>
+          Enter your email and password to sign in to your account
+        </CardDescription>
+      </CardHeader>
+      <form onSubmit={handleSubmit}>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="john@example.com"
+              required
+              value={formData.email}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              required
+              value={formData.password}
+              onChange={handleChange}
+            />
+          </div>
+        </CardContent>
+        <CardFooter className="flex flex-col space-y-4">
+          <Button className="w-full" type="submit" disabled={isLoading}>
+            {isLoading ? "Signing in..." : "Sign in"}
+          </Button>
+          <p className="text-sm text-muted-foreground">
+            Don&apos;t have an account?{" "}
+            <Link href="/auth/signup" className="text-primary underline-offset-4 hover:underline">
+              Sign up
+            </Link>
+          </p>
+        </CardFooter>
+      </form>
+    </Card>
+  )
+}
+
+export default function SignInPage() {
+  return (
     <div className="container flex h-screen w-screen flex-col items-center justify-center">
-      <Card className="w-full max-w-lg">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Sign in</CardTitle>
-          <CardDescription>
-            Enter your email and password to sign in to your account
-          </CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="john@example.com"
-                required
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                required
-                value={formData.password}
-                onChange={handleChange}
-              />
-            </div>
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
-            <Button className="w-full" type="submit" disabled={isLoading}>
-              {isLoading ? "Signing in..." : "Sign in"}
-            </Button>
-            <p className="text-sm text-muted-foreground">
-              Don&apos;t have an account?{" "}
-              <Link href="/auth/signup" className="text-primary underline-offset-4 hover:underline">
-                Sign up
-              </Link>
-            </p>
-          </CardFooter>
-        </form>
-      </Card>
+      <Suspense>
+        <SignInForm />
+      </Suspense>
     </div>
   )
 }
