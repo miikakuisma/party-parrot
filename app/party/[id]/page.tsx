@@ -37,9 +37,9 @@ export default async function PartyPage({ params }: { params: { id: string } }) 
   }
 
   return (
-    <div className="container py-8">
-      <Card>
-        <CardHeader>
+    <div className="container py-8 max-w-2xl mx-auto">
+      <Card className="bg-gradient-to-b from-slate-600 to-slate-900">
+        <CardHeader className="bg-slate-900">
           <div className="flex justify-between items-center">
             <CardTitle className="text-3xl">{event.title}</CardTitle>
             <Link href="/dashboard">
