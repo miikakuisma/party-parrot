@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { sql } from '@vercel/postgres'
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { authOptions } from "@/lib/auth"
 
 async function getEvents(userId: string) {
   console.log('Fetching events for user:', userId) // Debug log
@@ -31,9 +31,6 @@ export default async function Dashboard() {
     <div className="container py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Your Parties</h1>
-        <Link href="/create-party">
-          <Button>Create New Party</Button>
-        </Link>
       </div>
       {events.length === 0 ? (
         <Card>

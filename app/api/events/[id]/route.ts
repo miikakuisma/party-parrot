@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth"
 import { sql } from '@vercel/postgres'
 import { NextResponse } from 'next/server'
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { authOptions } from "@/lib/auth"
 
 export async function GET(
   req: Request,

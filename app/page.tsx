@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { authOptions } from "@/lib/auth"
 
 export default async function Home() {
   const session = await getServerSession(authOptions)
@@ -15,7 +15,7 @@ export default async function Home() {
     <main className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-8 text-center">
       <div className="max-w-3xl space-y-6">
         <h1 className="text-4xl font-bold sm:text-5xl md:text-6xl">
-          Welcome to Kids Party Planner
+          Welcome to Party Parrot
         </h1>
         <p className="text-lg text-muted-foreground sm:text-xl">
           Create amazing birthday parties for your kids. Send invitations, track RSVPs,
