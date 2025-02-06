@@ -1,10 +1,12 @@
 import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
 import { notFound } from "next/navigation"
+import Image from "next/image"
 import { sql } from '@vercel/postgres'
 import { authOptions } from "@/lib/auth"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { ImageIcon } from "lucide-react"
 import Link from "next/link"
 
 async function getEvent(id: string, userId: string) {
@@ -46,6 +48,22 @@ export default async function PartyPage({ params }: { params: { id: string } }) 
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
+          {event.image_url ? (
+            <div className="relative w-full aspect-video rounded-lg overflow-hidden">
+              <Image
+                src={event.image_url}
+                alt={event.title}
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
+          ) : (
+            <div className="w-full aspect-video bg-muted rounded-lg flex items-center justify-center">
+              <ImageIcon className="h-12 w-12 text-muted-foreground" />
+            </div>
+          )}
+          
           <div>
             <h3 className="font-semibold mb-2">Date and Time</h3>
             <p>

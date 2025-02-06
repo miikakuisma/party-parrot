@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -10,8 +10,20 @@ import { Label } from "@/components/ui/label"
 import { toast } from "@/components/ui/use-toast"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ImagePlus, Loader2 } from "lucide-react"
+import Link from "next/link"
 
-export default function CreatePartyPage() {
+interface Event {
+  id: string
+  title: string
+  date: string
+  time: string | null
+  location: string | null
+  description: string | null
+  max_guests: number | null
+  image_url: string | null
+}
+
+export default function EditPartyPage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [imageUrl, setImageUrl] = useState<string>("")
@@ -24,6 +36,37 @@ export default function CreatePartyPage() {
     description: "",
     maxGuests: "",
   })
+
+  useEffect(() => {
+    async function fetchEvent() {
+      try {
+        const response = await fetch(`/api/events/${params.id}`)
+        if (!response.ok) {
+          throw new Error("Failed to fetch event")
+        }
+        const event: Event = await response.json()
+        
+        setFormData({
+          title: event.title,
+          date: event.date,
+          time: event.time || "",
+          location: event.location || "",
+          description: event.description || "",
+          maxGuests: event.max_guests?.toString() || "",
+        })
+        setImageUrl(event.image_url || "")
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to load event details",
+          variant: "destructive",
+        })
+        router.push('/dashboard')
+      }
+    }
+
+    fetchEvent()
+  }, [params.id, router])
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.[0]) return
@@ -66,8 +109,8 @@ export default function CreatePartyPage() {
     setIsLoading(true)
 
     try {
-      const response = await fetch("/api/events", {
-        method: "POST",
+      const response = await fetch(`/api/events/${params.id}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
@@ -76,17 +119,15 @@ export default function CreatePartyPage() {
       })
 
       if (!response.ok) {
-        throw new Error("Failed to create party")
+        throw new Error("Failed to update party")
       }
-
-      const data = await response.json()
 
       toast({
         title: "Success",
-        description: "Your party has been created!",
+        description: "Your party has been updated!",
       })
 
-      router.push(`/party/${data.id}`)
+      router.push(`/party/${params.id}`)
     } catch (error) {
       toast({
         title: "Error",
@@ -109,7 +150,12 @@ export default function CreatePartyPage() {
     <div className="container py-8">
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
-          <CardTitle>Create a New Party</CardTitle>
+          <div className="flex justify-between items-center">
+            <CardTitle>Edit Party</CardTitle>
+            <Link href={`/party/${params.id}`}>
+              <Button variant="outline">Cancel</Button>
+            </Link>
+          </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -204,13 +250,14 @@ export default function CreatePartyPage() {
                 onChange={handleChange}
               />
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading || uploadingImage}>
-              {isLoading ? "Creating..." : "Create Party"}
-            </Button>
+            <div className="flex gap-4">
+              <Button type="submit" className="flex-1" disabled={isLoading || uploadingImage}>
+                {isLoading ? "Saving..." : "Save Changes"}
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>
     </div>
   )
-}
-
+} 

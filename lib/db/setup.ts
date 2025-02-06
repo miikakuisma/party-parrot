@@ -24,6 +24,7 @@ export async function setupDatabase() {
         description TEXT,
         max_guests INTEGER,
         status VARCHAR(50) DEFAULT 'upcoming',
+        image_url TEXT,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
