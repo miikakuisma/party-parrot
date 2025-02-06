@@ -1,7 +1,10 @@
 import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
+import { sql } from '@vercel/postgres'
+import { compare } from 'bcryptjs'
+import { AuthOptions } from "next-auth"
 
-const handler = NextAuth({
+export const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -10,11 +13,36 @@ const handler = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        // Here you should check the credentials against your database
-        // This is just a placeholder implementation
-        if (credentials?.email === "user@example.com" && credentials?.password === "password") {
-          return { id: "1", name: "J Smith", email: "jsmith@example.com" }
-        } else {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Missing credentials")
+        }
+
+        try {
+          // Find user by email
+          const result = await sql`
+            SELECT * FROM users WHERE email = ${credentials.email}
+          `
+          
+          const user = result.rows[0]
+
+          if (!user) {
+            throw new Error("No user found")
+          }
+
+          // Compare passwords
+          const passwordMatch = await compare(credentials.password, user.password)
+
+          if (!passwordMatch) {
+            throw new Error("Invalid password")
+          }
+
+          return {
+            id: user.id.toString(),
+            name: user.name,
+            email: user.email,
+          }
+        } catch (error) {
+          console.error("Auth error:", error)
           return null
         }
       },
@@ -22,8 +50,28 @@ const handler = NextAuth({
   ],
   pages: {
     signIn: "/auth/signin",
+    error: "/auth/error",
   },
-})
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id
+      }
+      return token
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string
+      }
+      return session
+    },
+  },
+  session: {
+    strategy: "jwt",
+  },
+}
+
+const handler = NextAuth(authOptions)
 
 export { handler as GET, handler as POST }
 

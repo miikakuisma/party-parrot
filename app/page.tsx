@@ -1,32 +1,40 @@
-import Link from "next/link"
+import { getServerSession } from "next-auth"
+import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 
-export default function Home() {
+export default async function Home() {
+  const session = await getServerSession(authOptions)
+  
+  if (session?.user) {
+    redirect('/dashboard')
+  }
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] bg-gradient-to-b from-background to-muted">
-      <div className="container px-4 md:px-6 flex flex-col items-center space-y-8 text-center">
-        <div className="space-y-4">
-          <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/50">
-            Welcome to Kids Party Planner
-          </h1>
-          <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-            Organize amazing birthday parties for your kids with ease. Create, plan, and manage all your party details in one place.
-          </p>
-        </div>
-        <div className="space-x-4">
-          <Link href="/create-party">
-            <Button size="lg" className="shadow-lg hover:shadow-xl transition-all">
-              Create a Party
+    <main className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-8 text-center">
+      <div className="max-w-3xl space-y-6">
+        <h1 className="text-4xl font-bold sm:text-5xl md:text-6xl">
+          Welcome to Kids Party Planner
+        </h1>
+        <p className="text-lg text-muted-foreground sm:text-xl">
+          Create amazing birthday parties for your kids. Send invitations, track RSVPs,
+          and manage everything in one place.
+        </p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
+          <Link href="/auth/signin">
+            <Button size="lg" className="w-full sm:w-auto">
+              Get Started
             </Button>
           </Link>
-          <Link href="/dashboard">
-            <Button size="lg" variant="outline" className="shadow hover:shadow-md transition-all">
-              View Dashboard
+          <Link href="/auth/signup">
+            <Button size="lg" variant="outline" className="w-full sm:w-auto">
+              Create Account
             </Button>
           </Link>
         </div>
       </div>
-    </div>
+    </main>
   )
 }
 

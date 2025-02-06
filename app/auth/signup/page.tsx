@@ -1,8 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { signIn } from "next-auth/react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,13 +9,14 @@ import { Label } from "@/components/ui/label"
 import { toast } from "@/components/ui/use-toast"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
-export default function SignInPage() {
+export default function SignUpPage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
+    name: "",
     email: "",
     password: "",
+    confirmPassword: "",
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -24,29 +24,34 @@ export default function SignInPage() {
     setIsLoading(true)
 
     try {
-      const result = await signIn("credentials", {
-        email: formData.email,
-        password: formData.password,
-        redirect: false,
+      if (formData.password !== formData.confirmPassword) {
+        throw new Error("Passwords do not match")
+      }
+
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
       })
 
-      if (result?.error) {
-        throw new Error("Invalid credentials")
+      if (!response.ok) {
+        throw new Error("Registration failed")
       }
 
       toast({
-        title: "Success",
-        description: "You have been signed in",
+        title: "Account created!",
+        description: "Please sign in with your new account",
       })
-
-      // Get the callbackUrl from searchParams or default to "/"
-      const callbackUrl = searchParams.get("callbackUrl") || "/"
-      router.push(callbackUrl)
-      router.refresh()
+      
+      router.push("/auth/signin")
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to sign in",
+        description: error instanceof Error ? error.message : "Something went wrong",
         variant: "destructive",
       })
     } finally {
@@ -63,13 +68,24 @@ export default function SignInPage() {
     <div className="container flex h-screen w-screen flex-col items-center justify-center">
       <Card className="w-full max-w-lg">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Sign in</CardTitle>
+          <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
           <CardDescription>
-            Enter your email and password to sign in to your account
+            Enter your details below to create your account
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                name="name"
+                placeholder="John Doe"
+                required
+                value={formData.name}
+                onChange={handleChange}
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -93,15 +109,26 @@ export default function SignInPage() {
                 onChange={handleChange}
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                required
+                value={formData.confirmPassword}
+                onChange={handleChange}
+              />
+            </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button className="w-full" type="submit" disabled={isLoading}>
-              {isLoading ? "Signing in..." : "Sign in"}
+              {isLoading ? "Creating account..." : "Create account"}
             </Button>
             <p className="text-sm text-muted-foreground">
-              Don&apos;t have an account?{" "}
-              <Link href="/auth/signup" className="text-primary underline-offset-4 hover:underline">
-                Sign up
+              Already have an account?{" "}
+              <Link href="/auth/signin" className="text-primary underline-offset-4 hover:underline">
+                Sign in
               </Link>
             </p>
           </CardFooter>
@@ -109,5 +136,4 @@ export default function SignInPage() {
       </Card>
     </div>
   )
-}
-
+} 

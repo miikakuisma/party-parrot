@@ -85,8 +85,8 @@ export const FEATURES = {
 
 // Application-wide constants
 export const APP_CONSTANTS = {
-  APP_NAME: 'Kids Party Planner',
-  COMPANY_NAME: 'Party Parrot',
+  APP_NAME: 'Party Parrot',
+  COMPANY_NAME: 'Tatami Tuotanto Oy',
   SUPPORT_EMAIL: 'support@partyparrot.com',
   MAX_FILE_SIZE: 5 * 1024 * 1024, // 5MB
   ALLOWED_FILE_TYPES: ['image/jpeg', 'image/png', 'image/gif'],

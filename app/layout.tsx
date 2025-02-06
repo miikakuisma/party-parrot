@@ -10,8 +10,8 @@ import type React from "react" // Added import for React
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Kids Party Planner",
-  description: "Organize amazing birthday parties for your kids",
+  title: "Party Parrot",
+  description: "Organize kids birthday parties with ease",
 }
 
 export default function RootLayout({

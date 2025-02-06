@@ -6,85 +6,138 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { toast } from "@/components/ui/use-toast"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
-export default function CreateParty() {
+export default function CreatePartyPage() {
   const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     title: "",
     date: "",
     time: "",
     location: "",
-    rsvpOption: "yes-no",
-    giftPreferences: "",
+    description: "",
+    maxGuests: "",
   })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+
+    try {
+      const response = await fetch("/api/events", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to create party")
+      }
+
+      const data = await response.json()
+
+      toast({
+        title: "Success",
+        description: "Your party has been created!",
+      })
+
+      router.push(`/party/${data.id}`)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Something went wrong",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Here you would typically send the data to your API
-    console.log(formData)
-    toast({
-      title: "Party Created",
-      description: "Your party has been successfully created!",
-    })
-    router.push("/dashboard")
-  }
-
   return (
     <div className="container py-8">
-      <h1 className="text-3xl font-bold mb-6">Create a New Party</h1>
-      <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
-        <div>
-          <Label htmlFor="title">Party Title</Label>
-          <Input id="title" name="title" value={formData.title} onChange={handleChange} required />
-        </div>
-        <div>
-          <Label htmlFor="date">Date</Label>
-          <Input id="date" name="date" type="date" value={formData.date} onChange={handleChange} required />
-        </div>
-        <div>
-          <Label htmlFor="time">Time</Label>
-          <Input id="time" name="time" type="time" value={formData.time} onChange={handleChange} required />
-        </div>
-        <div>
-          <Label htmlFor="location">Location</Label>
-          <Input id="location" name="location" value={formData.location} onChange={handleChange} required />
-        </div>
-        <div>
-          <Label>RSVP Options</Label>
-          <RadioGroup
-            name="rsvpOption"
-            value={formData.rsvpOption}
-            onValueChange={(value) => setFormData((prev) => ({ ...prev, rsvpOption: value }))}
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="yes-no" id="yes-no" />
-              <Label htmlFor="yes-no">Yes/No</Label>
+      <Card className="max-w-2xl mx-auto">
+        <CardHeader>
+          <CardTitle>Create a New Party</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="title">Party Title</Label>
+              <Input
+                id="title"
+                name="title"
+                required
+                value={formData.title}
+                onChange={handleChange}
+              />
             </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="yes-no-maybe" id="yes-no-maybe" />
-              <Label htmlFor="yes-no-maybe">Yes/No/Maybe</Label>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="date">Date</Label>
+                <Input
+                  id="date"
+                  name="date"
+                  type="date"
+                  required
+                  value={formData.date}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="time">Time</Label>
+                <Input
+                  id="time"
+                  name="time"
+                  type="time"
+                  value={formData.time}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
-          </RadioGroup>
-        </div>
-        <div>
-          <Label htmlFor="giftPreferences">Gift Preferences</Label>
-          <Textarea
-            id="giftPreferences"
-            name="giftPreferences"
-            value={formData.giftPreferences}
-            onChange={handleChange}
-            placeholder="Enter any gift preferences or suggestions"
-          />
-        </div>
-        <Button type="submit">Create Party</Button>
-      </form>
+            <div className="space-y-2">
+              <Label htmlFor="location">Location</Label>
+              <Input
+                id="location"
+                name="location"
+                value={formData.location}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="maxGuests">Maximum Number of Guests</Label>
+              <Input
+                id="maxGuests"
+                name="maxGuests"
+                type="number"
+                min="1"
+                value={formData.maxGuests}
+                onChange={handleChange}
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Creating..." : "Create Party"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   )
 }
