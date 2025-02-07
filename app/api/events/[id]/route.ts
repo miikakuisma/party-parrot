@@ -45,7 +45,7 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const { title, date, time, location, description, maxGuests, imageUrl } = await req.json()
+    const { title, date, time, location, description, maxGuests, imageUrl, background_style } = await req.json()
 
     // Basic validation
     if (!title || !date) {
@@ -66,6 +66,7 @@ export async function PUT(
         description = ${description || null},
         max_guests = ${maxGuests ? parseInt(maxGuests) : null},
         image_url = ${imageUrl || null},
+        background_style = ${background_style || 'default'},
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ${parseInt(params.id)}
       AND user_id = ${parseInt(session.user.id)}

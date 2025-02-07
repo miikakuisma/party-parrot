@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useState, useEffect } from "react"
@@ -11,6 +12,8 @@ import { toast } from "@/components/ui/use-toast"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ImagePlus, Loader2 } from "lucide-react"
 import Link from "next/link"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 interface Event {
   id: string
@@ -21,7 +24,65 @@ interface Event {
   description: string | null
   max_guests: number | null
   image_url: string | null
+  background_style: string
 }
+
+const BACKGROUNDS_CONFIG = {
+  gradients: [
+    {
+      id: 'default',
+      className: 'bg-gradient-to-b from-slate-600 to-slate-900',
+      label: 'Default Dark'
+    },
+    {
+      id: 'gradient1',
+      className: 'bg-gradient-to-r from-rose-400 to-orange-300',
+      label: 'Sunset'
+    },
+    {
+      id: 'gradient2',
+      className: 'bg-gradient-to-r from-blue-400 to-emerald-400',
+      label: 'Ocean'
+    },
+    {
+      id: 'gradient3',
+      className: 'bg-gradient-to-r from-violet-500 to-purple-500',
+      label: 'Purple'
+    }
+  ],
+  images: [
+    {
+      id: 'autumn',
+      path: '/backgrounds/autumn.png',
+      label: 'Autumn'
+    },
+    {
+      id: 'winter',
+      path: '/backgrounds/winter.png',
+      label: 'Winter'
+    },
+    {
+      id: 'spring',
+      path: '/backgrounds/spring.png',
+      label: 'Spring'
+    },
+    {
+      id: 'summer',
+      path: '/backgrounds/summer.png',
+      label: 'Summer'
+    }
+  ]
+} as const
+
+const SelectionCheckmark = () => (
+  <div className="h-full flex items-center justify-center">
+    <div className="bg-white/20 rounded-full p-2">
+      <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+      </svg>
+    </div>
+  </div>
+)
 
 export default function EditPartyPage({ params }: { params: { id: string } }) {
   const router = useRouter()
@@ -35,6 +96,7 @@ export default function EditPartyPage({ params }: { params: { id: string } }) {
     location: "",
     description: "",
     maxGuests: "",
+    background_style: "default",
   })
 
   useEffect(() => {
@@ -53,8 +115,10 @@ export default function EditPartyPage({ params }: { params: { id: string } }) {
           location: event.location || "",
           description: event.description || "",
           maxGuests: event.max_guests?.toString() || "",
+          background_style: event.background_style,
         })
         setImageUrl(event.image_url || "")
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         toast({
           title: "Error",
@@ -93,6 +157,7 @@ export default function EditPartyPage({ params }: { params: { id: string } }) {
         title: "Success",
         description: "Image uploaded successfully",
       })
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast({
         title: "Error",
@@ -249,6 +314,64 @@ export default function EditPartyPage({ params }: { params: { id: string } }) {
                 value={formData.maxGuests}
                 onChange={handleChange}
               />
+            </div>
+            <div className="space-y-4">
+              <Label>Card Background</Label>
+              <Tabs defaultValue="gradients">
+                <TabsList>
+                  <TabsTrigger value="gradients">Gradients</TabsTrigger>
+                  <TabsTrigger value="images">Images</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="gradients">
+                  <RadioGroup
+                    value={formData.background_style}
+                    name="background_style"
+                    className="grid grid-cols-2 gap-4"
+                    onValueChange={(value) => {
+                      handleChange({ target: { name: 'background_style', value } } as any)
+                    }}
+                  >
+                    {BACKGROUNDS_CONFIG.gradients.map((gradient) => (
+                      <div key={gradient.id}>
+                        <RadioGroupItem value={gradient.id} id={gradient.id} className="peer sr-only" />
+                        <Label
+                          htmlFor={gradient.id}
+                          className={`block h-64 rounded-lg cursor-pointer ring-offset-2 peer-checked:ring-2 peer-checked:ring-primary transition-all hover:opacity-90 ${gradient.className}`}
+                        >
+                          {formData.background_style === gradient.id && <SelectionCheckmark />}
+                          <span className="sr-only">{gradient.label}</span>
+                        </Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </TabsContent>
+                
+                <TabsContent value="images">
+                  <RadioGroup
+                    value={formData.background_style}
+                    name="background_style"
+                    className="grid grid-cols-2 gap-4"
+                    onValueChange={(value) => {
+                      handleChange({ target: { name: 'background_style', value } } as any)
+                    }}
+                  >
+                    {BACKGROUNDS_CONFIG.images.map((image) => (
+                      <div key={image.id}>
+                        <RadioGroupItem value={image.id} id={image.id} className="peer sr-only" />
+                        <Label
+                          htmlFor={image.id}
+                          className="block h-64 rounded-lg cursor-pointer ring-offset-2 peer-checked:ring-2 peer-checked:ring-primary transition-all hover:opacity-90 bg-cover bg-center"
+                          style={{ backgroundImage: `url('${image.path}')` }}
+                        >
+                          {formData.background_style === image.id && <SelectionCheckmark />}
+                          <span className="sr-only">{image.label}</span>
+                        </Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </TabsContent>
+              </Tabs>
             </div>
             <div className="flex gap-4">
               <Button type="submit" className="flex-1" disabled={isLoading || uploadingImage}>

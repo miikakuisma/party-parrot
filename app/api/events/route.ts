@@ -11,7 +11,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const { title, date, time, location, description, maxGuests, imageUrl } = await req.json()
+    const { title, date, time, location, description, maxGuests, imageUrl, background_style } = await req.json()
 
     // Basic validation
     if (!title || !date) {
@@ -31,7 +31,8 @@ export async function POST(req: Request) {
         location, 
         description, 
         max_guests,
-        image_url
+        image_url,
+        background_style
       ) VALUES (
         ${parseInt(session.user.id)}, 
         ${title}, 
@@ -40,7 +41,8 @@ export async function POST(req: Request) {
         ${location || null}, 
         ${description || null}, 
         ${maxGuests ? parseInt(maxGuests) : null},
-        ${imageUrl || null}
+        ${imageUrl || null},
+        ${background_style || 'default'}
       )
       RETURNING id
     `
