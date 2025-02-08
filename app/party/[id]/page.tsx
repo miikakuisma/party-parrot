@@ -44,19 +44,25 @@ export default async function PartyPage({ params }: { params: { id: string } }) 
           <Button variant="secondary">Back to Dashboard</Button>
         </Link>
       </div>
-      <Card className={`${getBackgroundStyle(event.background_style)} text-white`}>
+      <Card
+        className={`${getBackgroundStyle(event.background_style)} text-white`}
+        style={{
+          backgroundImage: `url(/backgrounds/${event.background_style}.png)`
+        }}
+      >
         <CardHeader>
           <CardTitle>&nbsp;</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="relative w-full aspect-video rounded-lg overflow-hidden flex justify-center items-center text-center">
-            {/* <Image
+          <div className="relative w-full aspect-video rounded-lg overflow-hidden flex flex-col justify-center items-center text-center">
+            <Image
               src={event.image_url}
               alt={event.title}
-              fill
+              width={128}
+              height={128}
               className="object-cover"
               priority
-            /> */}
+            />
             <span className="text-6xl font-bold text-slate-800">{event.title}</span>
           </div>
         </CardContent>

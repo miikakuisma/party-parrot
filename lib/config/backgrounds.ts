@@ -50,7 +50,7 @@ export function getBackgroundStyle(style: string = 'default'): string {
     ...BACKGROUNDS_CONFIG.gradients.map(g => ({ id: g.id, className: g.className })),
     ...BACKGROUNDS_CONFIG.images.map(i => ({ 
       id: i.id, 
-      className: `bg-[url("${i.path}")] bg-cover bg-center` 
+      className: `bg-cover bg-center`
     }))
   ]
   
