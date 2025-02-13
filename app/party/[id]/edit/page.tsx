@@ -14,6 +14,7 @@ import { ImagePlus, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { BACKGROUNDS_CONFIG } from "@/lib/config/backgrounds"
 
 interface Event {
   id: string
@@ -26,53 +27,6 @@ interface Event {
   image_url: string | null
   background_style: string
 }
-
-const BACKGROUNDS_CONFIG = {
-  gradients: [
-    {
-      id: 'default',
-      className: 'bg-gradient-to-b from-slate-600 to-slate-900',
-      label: 'Default Dark'
-    },
-    {
-      id: 'gradient1',
-      className: 'bg-gradient-to-r from-rose-400 to-orange-300',
-      label: 'Sunset'
-    },
-    {
-      id: 'gradient2',
-      className: 'bg-gradient-to-r from-blue-400 to-emerald-400',
-      label: 'Ocean'
-    },
-    {
-      id: 'gradient3',
-      className: 'bg-gradient-to-r from-violet-500 to-purple-500',
-      label: 'Purple'
-    }
-  ],
-  images: [
-    {
-      id: 'autumn',
-      path: '/backgrounds/autumn.png',
-      label: 'Autumn'
-    },
-    {
-      id: 'winter',
-      path: '/backgrounds/winter.png',
-      label: 'Winter'
-    },
-    {
-      id: 'spring',
-      path: '/backgrounds/spring.png',
-      label: 'Spring'
-    },
-    {
-      id: 'summer',
-      path: '/backgrounds/summer.png',
-      label: 'Summer'
-    }
-  ]
-} as const
 
 const SelectionCheckmark = () => (
   <div className="h-full flex items-center justify-center">

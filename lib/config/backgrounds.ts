@@ -23,14 +23,34 @@ export const BACKGROUNDS_CONFIG = {
   ],
   images: [
     {
-      id: 'autumn',
-      path: '/backgrounds/autumn.png',
-      label: 'Autumn'
+      id: 'balloons',
+      path: '/backgrounds/balloons.png',
+      label: 'Balloons'
     },
     {
-      id: 'winter',
-      path: '/backgrounds/winter.png',
-      label: 'Winter'
+      id: 'beach',
+      path: '/backgrounds/beach.png',
+      label: 'Beach'
+    },
+    {
+      id: 'easter',
+      path: '/backgrounds/easter.png',
+      label: 'Easter'
+    },
+    {
+      id: 'grill',
+      path: '/backgrounds/grill.png',
+      label: 'BBQ'
+    },
+    {
+      id: 'halloween',
+      path: '/backgrounds/halloween.png',
+      label: 'Halloween'
+    },
+    {
+      id: 'mountains',
+      path: '/backgrounds/mountains.png',
+      label: 'Mountains'
     },
     {
       id: 'spring',
@@ -41,6 +61,16 @@ export const BACKGROUNDS_CONFIG = {
       id: 'summer',
       path: '/backgrounds/summer.png',
       label: 'Summer'
+    },
+    {
+      id: 'winter',
+      path: '/backgrounds/winter.png',
+      label: 'Winter'
+    },
+    {
+      id: 'autumn',
+      path: '/backgrounds/autumn.png',
+      label: 'Autumn'
     }
   ]
 } as const
