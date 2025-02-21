@@ -4,9 +4,19 @@ import { notFound } from "next/navigation"
 import Image from "next/image"
 import { sql } from '@vercel/postgres'
 import { authOptions } from "@/lib/auth"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { ScrollText } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { toast } from "@/components/ui/use-toast"
+import { useRouter } from "next/navigation"
+import { RsvpActions } from "./components/rsvp-actions"
 
 async function getEvent(id: string, userId: string) {
   const result = await sql`
@@ -22,6 +32,28 @@ async function getEvent(id: string, userId: string) {
   return result.rows[0]
 }
 
+async function getRsvps(eventId: string) {
+  const result = await sql`
+    SELECT * FROM rsvps 
+    WHERE event_id = ${parseInt(eventId)}
+    ORDER BY created_at DESC
+  `
+  return result.rows
+}
+
+async function getRsvpWithMessages(eventId: string) {
+  const result = await sql`
+    SELECT r.*, 
+           COUNT(m.id) as message_count
+    FROM rsvps r
+    LEFT JOIN messages m ON r.id = m.rsvp_id
+    WHERE r.event_id = ${parseInt(eventId)}
+    GROUP BY r.id
+    ORDER BY r.created_at DESC
+  `
+  return result.rows
+}
+
 export default async function PartyPage({ params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions)
   
@@ -30,6 +62,8 @@ export default async function PartyPage({ params }: { params: { id: string } }) 
   }
 
   const event = await getEvent(params.id, session.user.id)
+  const rsvps = await getRsvps(params.id)
+  const rsvpsWithMessages = await getRsvpWithMessages(params.id)
 
   if (!event) {
     notFound()
@@ -111,13 +145,70 @@ export default async function PartyPage({ params }: { params: { id: string } }) 
               <Link href={`/party/${event.id}/edit`}>
                 <Button>Edit Party</Button>
               </Link>
-              <Link href={`/party/${event.id}/invite`}>
-                <Button variant="secondary">Send Invites</Button>
+              <Link href={`/party/${event.id}/messages`}>
+                <Button variant="outline">
+                  View Messages
+                </Button>
               </Link>
             </div>
           </div>
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <ScrollText className="h-5 w-5" />
+              Guest List ({rsvpsWithMessages.length})
+            </CardTitle>
+            <Link href={`/party/${event.id}/invite`}>
+              <Button variant="secondary">Invite Guests</Button>
+            </Link>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {rsvpsWithMessages.length === 0 ? (
+            <p className="text-center text-muted-foreground py-8">
+              No RSVPs yet. Share the invitation link to get started!
+            </p>
+          ) : (
+            <div className="divide-y">
+              {rsvpsWithMessages.map((rsvp) => (
+                <div key={rsvp.id} className="py-4 first:pt-0 last:pb-0">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-medium">{rsvp.name}</p>
+                      <p className="text-sm text-muted-foreground">{rsvp.phone}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(rsvp.created_at).toLocaleDateString()}
+                      </p>
+                      <RsvpActions 
+                        eventId={params.id} 
+                        rsvpId={rsvp.id}
+                        hasMessages={rsvp.message_count > 0}
+                      />
+                    </div>
+                  </div>
+                  {rsvp.allergies && (
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      <span className="font-medium">Allergies/Diet:</span> {rsvp.allergies}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <div className="flex gap-4 justify-center">
+        <Link href={`/party/${event.id}/edit`}>
+          <Button>Edit Party</Button>
+        </Link>
+      </div>
     </div>
   )
 }
