@@ -4,11 +4,9 @@ import { notFound } from "next/navigation"
 import Image from "next/image"
 import { sql } from '@vercel/postgres'
 import { authOptions } from "@/lib/auth"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ImageIcon } from "lucide-react"
 import Link from "next/link"
-import { getBackgroundStyle } from "@/lib/config/backgrounds"
 
 async function getEvent(id: string, userId: string) {
   const result = await sql`
@@ -104,10 +102,10 @@ export default async function PartyPage({ params }: { params: { id: string } }) 
               <p>{event.max_guests ? `${event.max_guests} guests maximum` : "No guest limit"}</p>
             </div>
 
-            <div>
+            {/* <div>
               <h3 className="font-semibold mb-2">Status</h3>
               <p className="capitalize">{event.status}</p>
-            </div>
+            </div> */}
 
             <div className="flex gap-4 pt-4 justify-center">
               <Link href={`/party/${event.id}/edit`}>

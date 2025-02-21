@@ -12,12 +12,17 @@ export default async function Home() {
   }
 
   return (
-    <main className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-8 text-center">
+    <main
+      className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-8 text-center bg-cover bg-center"
+      style={{
+        backgroundImage: "url('/landing.jpg')",
+      }}
+    >
       <div className="max-w-3xl space-y-6">
         <h1 className="text-4xl font-bold sm:text-5xl md:text-6xl">
           Welcome to Party Parrot
         </h1>
-        <p className="text-lg text-muted-foreground sm:text-xl">
+        <p className="text-lg text-black/50 sm:text-xl backdrop-blur-lg p-4 rounded-lg border border-white/50">
           Create amazing birthday parties for your kids. Send invitations, track RSVPs,
           and manage everything in one place.
         </p>

@@ -15,6 +15,7 @@ import Link from "next/link"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BACKGROUNDS_CONFIG } from "@/lib/config/backgrounds"
+import { cn } from "@/lib/utils"
 
 interface Event {
   id: string
@@ -30,9 +31,9 @@ interface Event {
 
 const SelectionCheckmark = () => (
   <div className="h-full flex items-center justify-center">
-    <div className="bg-white/20 rounded-full p-2">
-      <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+    <div className="bg-white rounded-full p-2">
+      <svg className="w-6 h-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" />
       </svg>
     </div>
   </div>
@@ -64,12 +65,12 @@ export default function EditPartyPage({ params }: { params: { id: string } }) {
         
         setFormData({
           title: event.title,
-          date: event.date,
+          date: new Date(event.date).toISOString().split('T')[0],
           time: event.time || "",
           location: event.location || "",
           description: event.description || "",
           maxGuests: event.max_guests?.toString() || "",
-          background_style: event.background_style,
+          background_style: event.background_style || "default",
         })
         setImageUrl(event.image_url || "")
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -179,15 +180,23 @@ export default function EditPartyPage({ params }: { params: { id: string } }) {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label>Cover Image</Label>
+              <Label>Image</Label>
               <div className="flex flex-col items-center gap-4">
                 {imageUrl ? (
-                  <div className="relative w-full aspect-video">
+                  <div className="relative">
                     <Image
                       src={imageUrl}
                       alt="Cover"
-                      fill
-                      className="object-cover rounded-lg"
+                      width={0}
+                      height={0}
+                      sizes="100%"
+                      style={{
+                        width: 'auto',
+                        height: 'auto',
+                        maxWidth: '622px',
+                        maxHeight: '200px'
+                      }}
+                      className="rounded-lg"
                     />
                   </div>
                 ) : (
@@ -291,7 +300,10 @@ export default function EditPartyPage({ params }: { params: { id: string } }) {
                         <RadioGroupItem value={gradient.id} id={gradient.id} className="peer sr-only" />
                         <Label
                           htmlFor={gradient.id}
-                          className={`block h-64 rounded-lg cursor-pointer ring-offset-2 peer-checked:ring-2 peer-checked:ring-primary transition-all hover:opacity-90 ${gradient.className}`}
+                          className={cn(
+                            "block h-64 rounded-lg cursor-pointer ring-offset-2 peer-checked:ring-2 peer-checked:ring-primary transition-all hover:opacity-90",
+                            gradient.className
+                          )}
                         >
                           {formData.background_style === gradient.id && <SelectionCheckmark />}
                           <span className="sr-only">{gradient.label}</span>

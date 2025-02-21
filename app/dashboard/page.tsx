@@ -28,7 +28,7 @@ export default async function Dashboard() {
   console.log('Found events:', events) // Debug log
 
   return (
-    <div className="container py-8">
+    <div className="container py-8 h-[calc(100vh-6rem)]">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Your Parties</h1>
       </div>

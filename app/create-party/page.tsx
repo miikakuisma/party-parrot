@@ -10,6 +10,21 @@ import { Label } from "@/components/ui/label"
 import { toast } from "@/components/ui/use-toast"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ImagePlus, Loader2 } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { BACKGROUNDS_CONFIG } from "@/lib/config/backgrounds"
+import { cn } from "@/lib/utils"
+import type { ChangeEvent } from "react"
+
+const SelectionCheckmark = () => (
+  <div className="h-full flex items-center justify-center">
+    <div className="bg-white rounded-full p-2">
+      <svg className="w-6 h-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" />
+      </svg>
+    </div>
+  </div>
+)
 
 export default function CreatePartyPage() {
   const router = useRouter()
@@ -23,6 +38,7 @@ export default function CreatePartyPage() {
     location: "",
     description: "",
     maxGuests: "",
+    background_style: "default",
   })
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,7 +115,7 @@ export default function CreatePartyPage() {
   }
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { name: string; value: string } }
   ) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
@@ -114,7 +130,7 @@ export default function CreatePartyPage() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label>Cover Image</Label>
+              <Label>Image (optional)</Label>
               <div className="flex flex-col items-center gap-4">
                 {imageUrl ? (
                   <div className="relative w-full aspect-video">
@@ -126,7 +142,7 @@ export default function CreatePartyPage() {
                     />
                   </div>
                 ) : (
-                  <div className="w-full aspect-video bg-muted flex items-center justify-center rounded-lg">
+                  <div className="w-full h-24 bg-muted flex items-center justify-center rounded-lg">
                     <ImagePlus className="h-10 w-10 text-muted-foreground" />
                   </div>
                 )}
@@ -203,6 +219,63 @@ export default function CreatePartyPage() {
                 value={formData.maxGuests}
                 onChange={handleChange}
               />
+            </div>
+            <div className="space-y-4">
+              <Label>Card Background</Label>
+              <Tabs defaultValue="gradients">
+                <TabsList>
+                  <TabsTrigger value="gradients">Gradients</TabsTrigger>
+                  <TabsTrigger value="images">Images</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="gradients">
+                  <RadioGroup
+                    value={formData.background_style}
+                    name="background_style"
+                    className="grid grid-cols-2 gap-4"
+                    onValueChange={(value) => handleChange({ target: { name: 'background_style', value } })}
+                  >
+                    {BACKGROUNDS_CONFIG.gradients.map((gradient) => (
+                      <div key={gradient.id}>
+                        <RadioGroupItem value={gradient.id} id={gradient.id} className="peer sr-only" />
+                        <Label
+                          htmlFor={gradient.id}
+                          className={cn(
+                            "block h-64 rounded-lg cursor-pointer ring-offset-2 peer-checked:ring-2 peer-checked:ring-primary transition-all hover:opacity-90",
+                            gradient.className
+                          )}
+                        >
+                          {formData.background_style === gradient.id && <SelectionCheckmark />}
+                          <span className="sr-only">{gradient.label}</span>
+                        </Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </TabsContent>
+                
+                <TabsContent value="images">
+                  <RadioGroup
+                    value={formData.background_style}
+                    name="background_style"
+                    className="grid grid-cols-2 gap-4"
+                    onValueChange={(value) => handleChange({ target: { name: 'background_style', value } })}
+                  >
+                    {BACKGROUNDS_CONFIG.images.map((image) => (
+                      <div key={image.id}>
+                        <RadioGroupItem value={image.id} id={image.id} className="peer sr-only" />
+                        <Label
+                          htmlFor={image.id}
+                          className="block h-64 rounded-lg cursor-pointer ring-offset-2 peer-checked:ring-2 peer-checked:ring-primary transition-all hover:opacity-90 bg-cover bg-center"
+                          style={{ backgroundImage: `url('${image.path}')` }}
+                        >
+                          {formData.background_style === image.id && <SelectionCheckmark />}
+                          <span className="sr-only">{image.label}</span>
+                        </Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </TabsContent>
+              </Tabs>
             </div>
             <Button type="submit" className="w-full" disabled={isLoading || uploadingImage}>
               {isLoading ? "Creating..." : "Create Party"}

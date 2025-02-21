@@ -2,22 +2,22 @@ export const BACKGROUNDS_CONFIG = {
   gradients: [
     {
       id: 'default',
-      className: 'bg-gradient-to-b from-slate-600 to-slate-900',
+      className: 'bg-gradient-to-b from-slate-600 to-slate-900 hover:from-slate-500 hover:to-slate-800',
       label: 'Default Dark'
     },
     {
       id: 'gradient1',
-      className: 'bg-gradient-to-r from-rose-400 to-orange-300',
+      className: 'bg-gradient-to-r from-rose-400 via-fuchsia-500 to-indigo-500',
       label: 'Sunset'
     },
     {
       id: 'gradient2',
-      className: 'bg-gradient-to-r from-blue-400 to-emerald-400',
+      className: 'bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500',
       label: 'Ocean'
     },
     {
       id: 'gradient3',
-      className: 'bg-gradient-to-r from-violet-500 to-purple-500',
+      className: 'bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500',
       label: 'Purple'
     }
   ],
@@ -80,10 +80,10 @@ export function getBackgroundStyle(style: string = 'default'): string {
     ...BACKGROUNDS_CONFIG.gradients.map(g => ({ id: g.id, className: g.className })),
     ...BACKGROUNDS_CONFIG.images.map(i => ({ 
       id: i.id, 
-      className: `bg-cover bg-center`
+      className: `bg-[url('${i.path}')] bg-cover bg-center` 
     }))
   ]
   
   const background = allBackgrounds.find(bg => bg.id === style)
   return background?.className || allBackgrounds[0].className
-} 
+}

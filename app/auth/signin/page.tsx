@@ -112,7 +112,7 @@ function SignInForm() {
 
 export default function SignInPage() {
   return (
-    <div className="container flex h-screen w-screen flex-col items-center justify-center">
+    <div className="container flex w-screen flex-col items-center justify-center">
       <Suspense>
         <SignInForm />
       </Suspense>

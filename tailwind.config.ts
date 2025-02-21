@@ -75,6 +75,21 @@ const config = {
   	}
   },
   plugins: [require("tailwindcss-animate")],
+  safelist: [
+    'bg-gradient-to-b',
+    'bg-gradient-to-r',
+    'from-slate-600',
+    'to-slate-900',
+    'from-rose-400',
+    'via-fuchsia-500',
+    'to-indigo-500',
+    'from-emerald-400',
+    'via-cyan-400',
+    'to-blue-500',
+    'from-violet-500',
+    'via-purple-500',
+    'to-fuchsia-500',
+  ],
 } satisfies Config;
 
 export default config;
