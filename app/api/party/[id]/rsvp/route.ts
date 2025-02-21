@@ -19,12 +19,12 @@ export async function POST(
     // Create RSVP
     const result = await sql`
       INSERT INTO rsvps (
-        event_id,
+        event_short_id,
         name,
         phone,
         allergies
       ) VALUES (
-        ${parseInt(params.id)},
+        ${params.id},
         ${name},
         ${phone},
         ${allergies || null}

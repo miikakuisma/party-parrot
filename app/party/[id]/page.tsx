@@ -8,20 +8,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { ScrollText } from "lucide-react"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { toast } from "@/components/ui/use-toast"
-import { useRouter } from "next/navigation"
 import { RsvpActions } from "./components/rsvp-actions"
 
 async function getEvent(id: string, userId: string) {
   const result = await sql`
     SELECT * FROM events 
-    WHERE id = ${parseInt(id)}
+    WHERE short_id = ${id}
     AND user_id = ${parseInt(userId)}
   `
   
@@ -35,7 +27,7 @@ async function getEvent(id: string, userId: string) {
 async function getRsvps(eventId: string) {
   const result = await sql`
     SELECT * FROM rsvps 
-    WHERE event_id = ${parseInt(eventId)}
+    WHERE event_short_id = ${eventId}
     ORDER BY created_at DESC
   `
   return result.rows
@@ -47,7 +39,7 @@ async function getRsvpWithMessages(eventId: string) {
            COUNT(m.id) as message_count
     FROM rsvps r
     LEFT JOIN messages m ON r.id = m.rsvp_id
-    WHERE r.event_id = ${parseInt(eventId)}
+    WHERE r.event_short_id = ${eventId}
     GROUP BY r.id
     ORDER BY r.created_at DESC
   `
@@ -142,10 +134,10 @@ export default async function PartyPage({ params }: { params: { id: string } }) 
             </div> */}
 
             <div className="flex gap-4 pt-4 justify-center">
-              <Link href={`/party/${event.id}/edit`}>
+              <Link href={`/party/${event.short_id}/edit`}>
                 <Button>Edit Party</Button>
               </Link>
-              <Link href={`/party/${event.id}/messages`}>
+              <Link href={`/party/${event.short_id}/messages`}>
                 <Button variant="outline">
                   View Messages
                 </Button>
@@ -162,7 +154,7 @@ export default async function PartyPage({ params }: { params: { id: string } }) 
               <ScrollText className="h-5 w-5" />
               Guest List ({rsvpsWithMessages.length})
             </CardTitle>
-            <Link href={`/party/${event.id}/invite`}>
+            <Link href={`/party/${event.short_id}/invite`}>
               <Button variant="secondary">Invite Guests</Button>
             </Link>
           </div>
@@ -205,7 +197,7 @@ export default async function PartyPage({ params }: { params: { id: string } }) 
       </Card>
 
       <div className="flex gap-4 justify-center">
-        <Link href={`/party/${event.id}/edit`}>
+        <Link href={`/party/${event.short_id}/edit`}>
           <Button>Edit Party</Button>
         </Link>
       </div>

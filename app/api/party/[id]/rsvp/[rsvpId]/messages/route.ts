@@ -9,7 +9,7 @@ export async function DELETE(
     await sql`
       DELETE FROM messages
       WHERE rsvp_id = ${parseInt(params.rsvpId)}
-      AND event_id = ${parseInt(params.id)}
+      AND event_short_id = ${params.id}
     `
 
     return NextResponse.json(

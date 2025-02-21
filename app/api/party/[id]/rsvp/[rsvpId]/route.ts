@@ -21,7 +21,7 @@ export async function PATCH(
         status = ${status},
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ${parseInt(params.rsvpId)}
-      AND event_id = ${parseInt(params.id)}
+      AND event_short_id = ${params.id}
     `
 
     return NextResponse.json(
@@ -46,14 +46,14 @@ export async function DELETE(
     await sql`
       DELETE FROM messages
       WHERE rsvp_id = ${parseInt(params.rsvpId)}
-      AND event_id = ${parseInt(params.id)}
+      AND event_short_id = ${params.id}
     `
 
     // Then delete the RSVP
     await sql`
       DELETE FROM rsvps
       WHERE id = ${parseInt(params.rsvpId)}
-      AND event_id = ${parseInt(params.id)}
+      AND event_short_id = ${params.id}
     `
 
     return NextResponse.json(

@@ -17,11 +17,11 @@ export async function POST(
 
     await sql`
       INSERT INTO messages (
-        event_id,
+        event_short_id,
         rsvp_id,
         content
       ) VALUES (
-        ${parseInt(params.id)},
+        ${params.id},
         ${rsvpId || null},
         ${message}
       )

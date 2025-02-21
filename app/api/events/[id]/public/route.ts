@@ -8,7 +8,7 @@ export async function GET(
   try {
     const result = await sql`
       SELECT 
-        id, 
+        short_id,
         title, 
         date, 
         time, 
@@ -18,7 +18,7 @@ export async function GET(
         image_url,
         background_style
       FROM events 
-      WHERE id = ${parseInt(params.id)}
+      WHERE short_id = ${params.id}
     `
 
     if (result.rows.length === 0) {

@@ -18,7 +18,7 @@ export default function RsvpSuccessPage({ params }: { params: { id: string } }) 
             Thank you for your RSVP. We look forward to seeing you at the party!
           </p>
           <div className="flex justify-center">
-            <Link href={`/party/${params.id}`}>
+            <Link href={`/party/${params.id}/rsvp`}>
               <Button variant="outline">View Party Details</Button>
             </Link>
           </div>

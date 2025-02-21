@@ -13,7 +13,7 @@ import { Loader2 } from "lucide-react"
 import Image from "next/image"
 
 interface Event {
-  id: string
+  short_id: string
   title: string
   date: string
   time: string | null
@@ -24,6 +24,12 @@ interface Event {
   background_style: string
 }
 
+interface StoredRsvp {
+  id: number
+  name: string
+  status: string
+}
+
 export default function RsvpPage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
@@ -31,12 +37,21 @@ export default function RsvpPage({ params }: { params: { id: string } }) {
   const [showForm, setShowForm] = useState(false)
   const [showMessageForm, setShowMessageForm] = useState(false)
   const [message, setMessage] = useState("")
+  const [storedRsvp, setStoredRsvp] = useState<StoredRsvp | null>(null)
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     allergies: "",
     status: "attending"
   })
+
+  useEffect(() => {
+    // Load stored RSVP data for this event
+    const stored = localStorage.getItem(`rsvp-${params.id}`)
+    if (stored) {
+      setStoredRsvp(JSON.parse(stored))
+    }
+  }, [params.id])
 
   useEffect(() => {
     async function fetchEvent() {
@@ -68,6 +83,17 @@ export default function RsvpPage({ params }: { params: { id: string } }) {
       })
 
       if (!response.ok) throw new Error("Failed to submit RSVP")
+      
+      const data = await response.json()
+      
+      // Store RSVP data in localStorage
+      const rsvpData = {
+        id: data.id,
+        name: formData.name,
+        status: formData.status
+      }
+      localStorage.setItem(`rsvp-${params.id}`, JSON.stringify(rsvpData))
+      setStoredRsvp(rsvpData)
 
       toast({
         title: "Success!",
@@ -88,6 +114,39 @@ export default function RsvpPage({ params }: { params: { id: string } }) {
     }
   }
 
+  const handleCancelRsvp = async () => {
+    if (!storedRsvp) return
+    if (!confirm("Are you sure you want to cancel your RSVP?")) return
+
+    setIsLoading(true)
+    try {
+      const response = await fetch(`/api/party/${params.id}/rsvp/${storedRsvp.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "cancelled" }),
+      })
+
+      if (!response.ok) throw new Error()
+
+      const updatedRsvp = { ...storedRsvp, status: "cancelled" }
+      localStorage.setItem(`rsvp-${params.id}`, JSON.stringify(updatedRsvp))
+      setStoredRsvp(updatedRsvp)
+
+      toast({
+        title: "Success",
+        description: "Your RSVP has been cancelled",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to cancel RSVP",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -96,7 +155,10 @@ export default function RsvpPage({ params }: { params: { id: string } }) {
       const response = await fetch(`/api/party/${params.id}/message`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ 
+          message,
+          rsvpId: storedRsvp?.id // Include RSVP ID if available
+        }),
       })
 
       if (!response.ok) throw new Error("Failed to send message")
@@ -194,7 +256,31 @@ export default function RsvpPage({ params }: { params: { id: string } }) {
           <CardTitle>RSVP to Party</CardTitle>
         </CardHeader>
         <CardContent>
-          {!showForm ? (
+          {storedRsvp ? (
+            <div className="flex flex-col items-center gap-6">
+              <div className="text-center">
+                <p className="font-medium mb-2">Welcome back, {storedRsvp.name}!</p>
+                <p className="text-muted-foreground">
+                  Your RSVP status: <span className="capitalize">{storedRsvp.status}</span>
+                </p>
+              </div>
+              {storedRsvp.status === "attending" && (
+                <Button
+                  variant="destructive"
+                  onClick={handleCancelRsvp}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Processing..." : "Cancel My RSVP"}
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                onClick={() => setShowMessageForm(true)}
+              >
+                Send Message to Organizer
+              </Button>
+            </div>
+          ) : !showForm ? (
             <div className="flex flex-col items-center gap-6">
               <div className="text-center">
                 <p className="text-muted-foreground mb-4">
@@ -257,9 +343,18 @@ export default function RsvpPage({ params }: { params: { id: string } }) {
                 />
               </div>
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Submitting..." : "Submit RSVP"}
-              </Button>
+              <div className="flex gap-2">
+                <Button type="submit" className="flex-1" disabled={isLoading}>
+                  {isLoading ? "Submitting..." : "Submit RSVP"}
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  onClick={() => setShowForm(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
             </form>
           )}
 

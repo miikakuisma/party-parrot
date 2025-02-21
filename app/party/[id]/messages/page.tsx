@@ -5,13 +5,14 @@ import { authOptions } from "@/lib/auth"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { MessageActions } from "./message-actions"
 
 async function getMessages(eventId: string) {
   const result = await sql`
     SELECT m.*, r.name as guest_name
     FROM messages m
     LEFT JOIN rsvps r ON m.rsvp_id = r.id
-    WHERE m.event_id = ${parseInt(eventId)}
+    WHERE m.event_short_id = ${eventId}
     ORDER BY m.created_at DESC
   `
   return result.rows
@@ -54,9 +55,15 @@ export default async function MessagesPage({ params }: { params: { id: string } 
                       </p>
                       <p className="mt-1">{message.content}</p>
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      {new Date(message.created_at).toLocaleDateString()}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(message.created_at).toLocaleDateString()}
+                      </p>
+                      <MessageActions 
+                        eventId={params.id} 
+                        messageId={message.id}
+                      />
+                    </div>
                   </div>
                 </div>
               ))}

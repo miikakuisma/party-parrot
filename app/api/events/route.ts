@@ -1,3 +1,4 @@
+import { nanoid } from 'nanoid'
 import { getServerSession } from "next-auth"
 import { sql } from '@vercel/postgres'
 import { NextResponse } from 'next/server'
@@ -12,6 +13,7 @@ export async function POST(req: Request) {
     }
 
     const { title, date, time, location, description, maxGuests, imageUrl, background_style } = await req.json()
+    const shortId = nanoid(10) // Creates a 10-character unique ID
 
     // Basic validation
     if (!title || !date) {
@@ -24,31 +26,33 @@ export async function POST(req: Request) {
     // Create event
     const result = await sql`
       INSERT INTO events (
-        user_id, 
-        title, 
-        date, 
-        time, 
-        location, 
-        description, 
+        user_id,
+        short_id,
+        title,
+        date,
+        time,
+        location,
+        description,
         max_guests,
         image_url,
         background_style
       ) VALUES (
-        ${parseInt(session.user.id)}, 
-        ${title}, 
-        ${date}, 
-        ${time || null}, 
-        ${location || null}, 
-        ${description || null}, 
+        ${parseInt(session.user.id)},
+        ${shortId},
+        ${title},
+        ${date},
+        ${time || null},
+        ${location || null},
+        ${description || null},
         ${maxGuests ? parseInt(maxGuests) : null},
         ${imageUrl || null},
         ${background_style || 'default'}
       )
-      RETURNING id
+      RETURNING short_id
     `
 
     return NextResponse.json(
-      { id: result.rows[0].id },
+      { id: result.rows[0].short_id },
       { status: 201 }
     )
   } catch (error) {

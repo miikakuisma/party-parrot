@@ -6,10 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { sql } from '@vercel/postgres'
 import { authOptions } from "@/lib/auth"
-import { BACKGROUNDS_CONFIG } from "@/lib/config/backgrounds"
 
 async function getEvents(userId: string) {
-  console.log('Fetching events for user:', userId) // Debug log
+  console.log('Fetching events for user:', userId)
   const result = await sql`
     SELECT * FROM events 
     WHERE user_id = ${parseInt(userId)} 
@@ -45,7 +44,7 @@ export default async function Dashboard() {
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {events.map((event) => (
-            <Card key={event.id}>
+            <Card key={event.short_id}>
               <CardHeader>
                 <CardTitle>{event.title}</CardTitle>
               </CardHeader>
@@ -59,7 +58,7 @@ export default async function Dashboard() {
                 </p>
                 <Badge>{event.status}</Badge>
                 <div className="mt-4">
-                  <Link href={`/party/${event.id}`}>
+                  <Link href={`/party/${event.short_id}`}>
                     <Button variant="outline" size="sm">
                       View Details
                     </Button>
