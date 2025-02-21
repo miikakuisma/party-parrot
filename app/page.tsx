@@ -13,7 +13,7 @@ export default async function Home() {
 
   return (
     <main
-      className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-8 text-center bg-cover bg-center"
+      className="flex w-full min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-8 text-center bg-cover bg-center"
       style={{
         backgroundImage: "url('/landing.jpg')",
       }}
