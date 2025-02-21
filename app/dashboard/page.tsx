@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { sql } from '@vercel/postgres'
 import { authOptions } from "@/lib/auth"
+import { BACKGROUNDS_CONFIG } from "@/lib/config/backgrounds"
 
 async function getEvents(userId: string) {
   console.log('Fetching events for user:', userId) // Debug log
